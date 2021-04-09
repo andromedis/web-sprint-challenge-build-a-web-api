@@ -2,7 +2,7 @@ const express = require('express');
 
 
 const actionsRouter = require('./actions/actions-router')
-const Actions = require('./actions/actions-model')
+const projectsRouter = require('./projects/projects-router')
 
 const server = express();
 
@@ -12,6 +12,7 @@ const server = express();
 server.use(express.json())
 
 server.use('/api/actions', actionsRouter)
+server.use('/api/projects', projectsRouter)
 
 
 module.exports = server;
