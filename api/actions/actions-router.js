@@ -1,19 +1,11 @@
-// Write your "actions" router here!
-
-// - [ ] Inside `api/actions/actions-router.js` build endpoints for performing CRUD operations on _actions_:
-//   - `[GET] /api/actions` returns an array of actions (or an empty array) as the body of the _response_.
-//   - `[GET] /api/actions/:id` returns an action with the given `id` as the body of the _response_.
-//   - `[POST] /api/actions` returns the newly created action as the body of the _response_.
-//   - `[PUT] /api/actions/:id` returns the updated action as the body of the _response_.
-//   - `[DELETE] /api/actions/:id` returns no _response_ body.
-
 // Imports
 const Actions = require('./actions-model')
 const mw = require('../middleware/middleware')
 const express = require('express')
 
-// Router instance
+// Express Router instance
 const router = express.Router()
+
 
 // Actions endpoints
 
@@ -24,7 +16,6 @@ router.get('/', (req, res) => {
             res.status(200).json(actions)
         })
         .catch(err => {
-            console.error(err)
             res.status(500).json({ message: err.message })
         })
 })
@@ -35,26 +26,30 @@ router.get('/:id', mw.checkActionId, (req, res) => {
 })
 
 // [POST]   | `/api/actions`     | returns the newly created action as the body of the _response_
-// router.post('/', (req, res) => {
-//     Actions.insert(req.body)
-//         .then(action => {
-//             res.status(201).json(action)
-//         })
-//         .catch(err => {
-//             console.log(err)
-//             res.status(500).json({ message: err.message })
-//         })
-// })
+router.post('/', mw.checkValidAction, (req, res) => {
+    Actions.insert(req.body)
+        .then(action => {
+            res.status(201).json(action)
+        })
+        .catch(err => {
+            res.status(500).json({ message: err.message })
+        })
+})
 
 // [PUT]    | `/api/actions/:id` | returns the updated action as the body of the _response_
-// router.put('/:id', (req, res) => {
-
-// })
+router.put('/:id', mw.checkActionId, mw.checkValidAction, (req, res) => {
+    Actions.update(req.params.id, req.body)
+        .then(action => {
+            res.status(200).json(action)
+        })
+        .catch(err => {
+            res.status(500).json({ message: err.message })
+        })
+})
 
 // [DELETE] | `/api/actions/:id` | returns no _response_ body
 router.delete('/:id', mw.checkActionId, (req, res) => {
-    const { id } = req.params
-    Actions.remove(id)
+    Actions.remove(req.params.id)
         .then(() => {
             res.status(200).json({ message: `Action id=${id} deleted` })
         })
@@ -63,5 +58,6 @@ router.delete('/:id', mw.checkActionId, (req, res) => {
         })
 })
 
-// Module exports
+
+// Exports
 module.exports = router
